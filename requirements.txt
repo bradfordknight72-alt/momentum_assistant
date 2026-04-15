@@ -1,0 +1,5 @@
+streamlit
+langchain
+langchain-community
+langchain-xai
+psycopg2-binary   # for Neon Postgres
