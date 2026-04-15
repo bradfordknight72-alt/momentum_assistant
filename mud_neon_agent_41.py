@@ -7,10 +7,9 @@ from langchain_xai import ChatXAI
 st.set_page_config(page_title="Momentum Mud Assistant", page_icon="🛢️", layout="wide")
 st.title("🛢️ Momentum Mud Assistant beta")
 
-# Minimal initialization to avoid Pydantic errors
+# Minimal ChatXAI initialization to avoid validation errors
 llm = ChatXAI(
     model="grok-4-1-fast-non-reasoning",
-    temperature=0.0,
     xai_api_key=st.secrets["XAI_API_KEY"]
 )
 
