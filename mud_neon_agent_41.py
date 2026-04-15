@@ -1,4 +1,3 @@
-# mud_neon_agent_41.py - FIXED FOR STREAMLIT CLOUD
 import streamlit as st
 from langchain_community.utilities import SQLDatabase
 from langchain_community.agent_toolkits.sql.base import create_sql_agent
@@ -8,13 +7,11 @@ from langchain_xai import ChatXAI
 st.set_page_config(page_title="Momentum Mud Assistant", page_icon="🛢️", layout="wide")
 st.title("🛢️ Momentum Mud Assistant beta")
 
-# Load API key safely from secrets
-xai_key = st.secrets["XAI_API_KEY"]
-
+# Minimal initialization to avoid Pydantic errors
 llm = ChatXAI(
     model="grok-4-1-fast-non-reasoning",
     temperature=0.0,
-    xai_api_key=xai_key,
+    xai_api_key=st.secrets["XAI_API_KEY"]
 )
 
 DATABASE_URL = "postgresql://MomentumDB:npg_VkXJWtT3GBO0@ep-blue-wind-anin6o30-pooler.c-6.us-east-1.aws.neon.tech:5432/neondb?sslmode=require"
@@ -25,12 +22,12 @@ toolkit = SQLDatabaseToolkit(db=db, llm=llm)
 CUSTOM_PREFIX = """You are the Momentum Mud Assistant beta. Answer ONLY with real data from the database.
 
 Key facts:
-- Products (including BARITE) are in IntervalProducts. Search with ILIKE '%BARITE%'.
-- Join to Wells on well_id for pad/well info.
-- For any pad, use LOWER("Pad") LIKE LOWER('%pad name%') for flexible matching.
-- Always use SUM(quantity) for totals.
+- BARITE products are in IntervalProducts. Search with ILIKE '%BARITE%'.
+- Join to Wells on well_id.
+- For pads, use LOWER("Pad") LIKE LOWER('%pad name%').
+- Use SUM(quantity) for totals.
 
-Be precise and use bullet points."""
+Use bullet points."""
 
 agent_executor = create_sql_agent(
     llm=llm,
@@ -39,8 +36,8 @@ agent_executor = create_sql_agent(
     verbose=False,
     agent_type="zero-shot-react-description",
     handle_parsing_errors=True,
-    top_k=100,
-    max_iterations=12
+    top_k=80,
+    max_iterations=10
 )
 
 if "messages" not in st.session_state:
@@ -56,7 +53,7 @@ if prompt := st.chat_input("Ask about barite usage, product costs on any pad, we
         st.markdown(prompt)
 
     with st.chat_message("assistant"):
-        with st.spinner("Querying master database..."):
+        with st.spinner("Querying database..."):
             try:
                 response = agent_executor.invoke({"input": prompt})
                 answer = response.get("output", "No data found.")
