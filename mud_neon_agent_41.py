@@ -7,13 +7,12 @@ from langchain_xai import ChatXAI
 st.set_page_config(page_title="Momentum Mud Assistant", page_icon="🛢️", layout="wide")
 st.title("🛢️ Momentum Mud Assistant beta")
 
-# Safe key loading
 xai_key = st.secrets["XAI_API_KEY"]
 
-# Minimal ChatXAI setup
 llm = ChatXAI(
     model="grok-4-1-fast-non-reasoning",
-    xai_api_key=xai_key
+    xai_api_key=xai_key,
+    temperature=0.0
 )
 
 DATABASE_URL = "postgresql://MomentumDB:npg_VkXJWtT3GBO0@ep-blue-wind-anin6o30-pooler.c-6.us-east-1.aws.neon.tech:5432/neondb?sslmode=require"
